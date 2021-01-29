@@ -1,0 +1,26 @@
+.git/
+
+build
+dist
+*.egg-info
+*.egg/
+*.pyc
+*.swp
+
+.tox
+.coverage
+html/*
+__pycache__
+
+# Compiled Documentation
+docs/_build
+
+# virtualenv
+.venv/
+venv/
+ENV/
+
+### OSX ###
+*.DS_Store
+.AppleDouble
+.LSOverride
