@@ -1,7 +1,3 @@
---no-index
---find-links="repo/mirror"
---find-links="repo/leolani"
-
 Flask
 
 connexion
