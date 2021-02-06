@@ -11,6 +11,8 @@ setup(
     version=version,
     package_dir={'': 'src'},
     packages=find_namespace_packages(include=['cltl.*']),
+    package_data={'': ['version.txt']},
+    include_package_data=True,
     url="https://github.com/leolani/cltl-demo",
     license='MIT License',
     author='CLTL',
