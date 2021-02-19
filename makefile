@@ -29,6 +29,7 @@ install: py-install
 docker: py-install
 	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-producer:$(project_version)" -f Dockerfile.producer .
 	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-consumer:$(project_version)" -f Dockerfile.consumer .
+	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-ping:$(project_version)" -f Dockerfile.ping .
 
 .PHONY: run
 run:

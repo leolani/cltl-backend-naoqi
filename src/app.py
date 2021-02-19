@@ -1,4 +1,6 @@
 import logging.config
+import time
+
 logging.config.fileConfig('config/logging.config')
 
 import json
@@ -49,8 +51,12 @@ class Application(ApplicationContainer):
     def run(self):
         if self._args.producer:
             self.producer.start()
-        if self._args.consumer:
+        elif self._args.consumer:
             self.consumer.start()
+        else:
+            while True:
+                logger.info("Ping")
+                time.sleep(1)
 
 
 if __name__ == '__main__':
