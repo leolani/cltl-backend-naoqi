@@ -27,11 +27,11 @@ install: py-install
 
 .PHONY: docker
 docker: py-install
-	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-producer:$project_version" -f Dockerfile.producer .
-	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-consumer:$project_version" -f Dockerfile.consumer .
+	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-producer:$(project_version)" -f Dockerfile.producer .
+	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-consumer:$(project_version)" -f Dockerfile.consumer .
 
 .PHONY: run
 run:
-	docker run --rm -d "cltl/demo-producer:$project_version"
-	docker run --rm -d "cltl/demo-consumer:$project_version"
+	docker run --rm -d "cltl/demo-producer:$(project_version)"
+	docker run --rm -d "cltl/demo-consumer:$(project_version)"
 
