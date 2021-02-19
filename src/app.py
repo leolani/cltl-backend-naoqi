@@ -2,17 +2,12 @@ import logging.config
 logging.config.fileConfig('config/logging.config')
 
 import json
-import sys
 from types import SimpleNamespace
 
-import connexion
-import event.handler
-import rest.endpoint
 from cltl.combot.infra.config.local import LocalConfigurationContainer
 from cltl.combot.infra.di_container import singleton
 from cltl.combot.infra.event.kombu import KombuEventBus
 from cltl.combot.infra.resource.threaded import ThreadedResourceContainer
-from cltl.demo.api import ExampleComponent
 from event.handler import TemplateWorker
 from kombu.serialization import register
 
@@ -52,34 +47,10 @@ class Application(ApplicationContainer):
         self._args = args
 
     def run(self):
-        if self._args.data or self._args.file:
-            if self._args.data:
-                data_json = self._args.data
-            elif self._args.file:
-                with open(self._args.file) as f:
-                    data_json = f.read()
-
-            data = json.loads(data_json, object_hook=lambda d: SimpleNamespace(**d))
-            sys.stdout.write(ExampleComponent().foo_bar(data))
-        else:
-            if self._args.producer:
-                self.producer.start()
-            if self._args.consumer:
-                self.consumer.start()
-
-            if self._args.rest or self._args.consumer:
-                app = connexion.FlaskApp(__name__)
-                if self._args.rest:
-                    app.add_api(rest.endpoint.api.spec.to_dict())
-                # if self._args.consumer:
-                    # app.add_api(event.handler.api.spec.to_dict())
-
-                # TODO Production WSGI server, see https://mikebridge.github.io/post/python-flask-kubernetes-3/
-                # TODO Production WSGI server, see https://github.com/ram-ch/Building-microservices-with-docker-on-AWS
-                app.run()
-
-            if self._args.consumer:
-                self.consumer.stop()
+        if self._args.producer:
+            self.producer.start()
+        if self._args.consumer:
+            self.consumer.start()
 
 
 if __name__ == '__main__':
