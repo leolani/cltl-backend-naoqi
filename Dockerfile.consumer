@@ -3,10 +3,11 @@
 FROM python:3.9
 
 WORKDIR /demo
-COPY src requirements.txt ./
+COPY src requirements.txt makefile ./
 COPY config ./config
+COPY util ./util
 
 RUN --mount=type=bind,target=/demo/repo,from=cltl/requirements:0.0.1,source=/repo \
-        pip install --no-cache-dir -r requirements.txt
+        make venv project_repo=/demo/repo/leolani project_mirror=/demo/repo/mirror
 
-CMD python app.py --consumer
+CMD . venv/bin/activate && python app.py --consumer
