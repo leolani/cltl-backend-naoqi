@@ -67,4 +67,4 @@ class TemplateWorker(TopicWorker):
 
         result = DummyExampleComponent().foo_bar(event.payload)
 
-        self.event_bus.publish("cltl.topic.template", Event(result, None))
+        self.event_bus.publish("cltl.topic.template", Event.for_payload(result))

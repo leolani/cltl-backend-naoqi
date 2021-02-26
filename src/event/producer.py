@@ -59,7 +59,7 @@ class Producer(Thread):
         for i in range(self.__duration):
             if self.__terminate:
                 return
-            self.__event_bus.publish(TOPIC, Event(f"event{i}", ExampleInput(f"test {i}", 2), None))
+            self.__event_bus.publish(TOPIC, Event(f"event{i}", ExampleInput(f"test {i}", 2)))
             logger.debug("Sent event %s", i)
             sleep(1)
 
