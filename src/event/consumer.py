@@ -1,3 +1,5 @@
+import logging
+from collections import namedtuple
 from dataclasses import dataclass
 
 import asyncapi
@@ -9,6 +11,8 @@ from cltl.combot.infra.topic_worker import TopicWorker
 
 from cltl.demo.api import ExampleInput
 from cltl.demo.implementation import DummyExampleComponent
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -46,25 +50,23 @@ api = asyncapi.Specification(
 )
 
 
-TOPICS = ["cltl.topic.one", "cltl.topic.two"]
-
-
 class TemplateWorker(TopicWorker):
     def __init__(self, name: str, event_bus: EventBus, resource_manager: ResourceManager,
                  config_manager: ConfigurationManager) -> None:
-        config = config_manager.get_config("template.config")
+        config = config_manager.get_config("cltl.demo.config")
         self._name = name if name else config.get("name")
-        super().__init__(TOPICS, event_bus, interval=0, name=name, resource_manager=resource_manager,
-                         requires=[], provides=[])
-        # super().__init__(TOPICS, event_bus, interval=0, name=name, resource_manager=resource_manager,
-        #                  requires=TOPICS, provides=["cltl.topic.template"])
+        event_config = config_manager.get_config("cltl.demo.events")
+        self.topics = namedtuple("topics", ["topic_in", "topic_out"])(
+            event_config.get("consumer_topic_in"), event_config.get("consumer_topic_out"))
+        super().__init__([self.topics.topic_in], event_bus, interval=0, name=name, resource_manager=resource_manager,
+                         requires=[], provides=[self.topics.topic_out])
 
     def process(self, event: Event) -> None:
-        if "cltl.topic.one" == event.metadata.topic:
-            print(f"Received cltl.topic.one event {event.id}")
-        elif "cltl.topic.two" == event.metadata.topic:
-            print(f"Received cltl.topic.two event {event.id}")
+        if self.topics.topic_in == event.metadata.topic:
+            logger.info("Received %s event %s", self.topics.topic_in, event.id)
+        else:
+            logger.info("Received unhandled %s event %s", self.topics.topic_in, event.id)
 
         result = DummyExampleComponent().foo_bar(event.payload)
 
-        self.event_bus.publish("cltl.topic.template", Event.for_payload(result))
+        self.event_bus.publish(self.topics.topic_out, Event.for_payload(result))

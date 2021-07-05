@@ -1,5 +1,7 @@
 import logging
 from threading import Thread
+
+from cltl.combot.infra.config import ConfigurationManager
 from time import sleep
 
 from cltl.combot.infra.event import EventBus
@@ -44,22 +46,21 @@ logger = logging.getLogger(__name__)
 # )
 
 
-TOPIC = "cltl.topic.one"
-
-
 class Producer(Thread):
-    def __init__(self, event_bus: EventBus, duration: int = 60) -> None:
+    def __init__(self, event_bus: EventBus, config_manager: ConfigurationManager) -> None:
         super().__init__(None, name="producer")
         self.__event_bus = event_bus
+        config = config_manager.get_config("cltl.demo.events")
+        self._topic = config.get("producer_topic")
         self.__terminate = False
-        self.__duration = duration
+        self.__duration = config.get_int("duration")
 
     def run(self) -> None:
-        logger.info("Started producer")
+        logger.info("Started producer to run for %s seconds", self.__duration)
         for i in range(self.__duration):
             if self.__terminate:
                 return
-            self.__event_bus.publish(TOPIC, Event(f"event{i}", ExampleInput(f"test {i}", 2)))
+            self.__event_bus.publish(self._topic, Event(f"event{i}", ExampleInput(f"test {i}", 2)))
             logger.debug("Sent event %s", i)
             sleep(1)
 

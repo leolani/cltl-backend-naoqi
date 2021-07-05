@@ -41,7 +41,7 @@ class ApplicationContainer(ThreadedResourceContainer, LocalConfigurationContaine
     @property
     @singleton
     def producer(self):
-        return Producer(self.event_bus)
+        return Producer(self.event_bus, self.config_manager)
 
 
 class Application(ApplicationContainer):
