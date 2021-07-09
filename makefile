@@ -23,10 +23,10 @@ include util/make/makefile.git.mk
 # Don't use makefile.component.mk as we are building two docker images
 clean: py-clean
 
-install: py-install
+install: docker
 
 .PHONY: docker
-docker: py-install
+docker:
 	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-producer:$(project_version)" -f Dockerfile.producer .
 	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-consumer:$(project_version)" -f Dockerfile.consumer .
 	DOCKER_BUILDKIT=1 docker build -t "cltl/demo-ping:$(project_version)" -f Dockerfile.ping .
