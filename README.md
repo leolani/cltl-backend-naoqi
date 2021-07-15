@@ -19,8 +19,8 @@ Export it as Python library using setuptools to the cltl-requirements repository
 Provide a REST endpoint with an OpenAPI spec generated from the data classes.
 The template uses Flask with Marshmallow for this.
 
-### Event handler
-Provide an Event handler using the data classes, exposing an AsyncAPI sped.
+### Event consumer
+Provide an Event consumer using the data classes, exposing an AsyncAPI sped.
 
 ### Command line
 Create an main class that let's you invoke your service as Pyhton script from the command line.

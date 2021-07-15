@@ -10,7 +10,7 @@ from cltl.combot.infra.config.local import LocalConfigurationContainer
 from cltl.combot.infra.di_container import singleton
 from cltl.combot.infra.event.kombu import KombuEventBus
 from cltl.combot.infra.resource.threaded import ThreadedResourceContainer
-from event.handler import TemplateWorker
+from event.consumer import TemplateWorker
 from kombu.serialization import register
 
 from event.producer import Producer
