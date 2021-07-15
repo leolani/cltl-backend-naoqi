@@ -6,7 +6,7 @@ logging.config.fileConfig('config/logging.config')
 import json
 from types import SimpleNamespace
 
-from cltl.combot.infra.config.local import LocalConfigurationContainer
+from cltl.combot.infra.config.k8config import K8LocalConfigurationContainer
 from cltl.combot.infra.di_container import singleton
 from cltl.combot.infra.event.kombu import KombuEventBus
 from cltl.combot.infra.resource.threaded import ThreadedResourceContainer
@@ -18,9 +18,9 @@ from event.producer import Producer
 
 logger = logging.getLogger(__name__)
 
-LocalConfigurationContainer.load_configuration()
+K8LocalConfigurationContainer.load_configuration()
 
-class ApplicationContainer(ThreadedResourceContainer, LocalConfigurationContainer):
+class ApplicationContainer(ThreadedResourceContainer, K8LocalConfigurationContainer):
     logger.info("Initialized ApplicationContainer")
 
     @property
