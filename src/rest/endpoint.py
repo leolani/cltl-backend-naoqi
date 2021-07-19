@@ -1,74 +1,48 @@
-from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
-from apispec.yaml_utils import load_yaml_from_docstring
-from marshmallow_dataclass import class_schema
+import logging
 
-from cltl.demo.api import ExampleOutput, ExampleInput
-from cltl.demo.implementation import DummyExampleComponent
+import flask
+from cltl.combot.infra.config import ConfigurationManager
+from cltl.combot.infra.event import EventBus, Event
+from flask import jsonify, Response
 
-
-class OpenAPISpec:
-    def __init__(self, *args, **kwargs):
-        self.spec = APISpec(*args, **kwargs)
-
-    @property
-    def to_yaml(self):
-        return self.spec.to_yaml()
-
-    @property
-    def to_dict(self):
-        return self.spec.to_dict()
-
-    @property
-    def components(self):
-        return self.spec.components
-
-    def path(self, path):
-        def wrapped(func):
-            self.spec.path(path,
-                           description=func.__doc__.partition('\n')[0],
-                           operations=load_yaml_from_docstring(func.__doc__))
-            return func
-        return wrapped
+from cltl.chatui.api import Chat, Utterance
 
 
-api = OpenAPISpec(title="Template",
-                  version="0.0.1",
-                  openapi_version="3.0.2",
-                  info=dict(description="Leolani component template"),
-                  plugins=[MarshmallowPlugin()], )
+def create_app(chat: Chat, event_bus: EventBus, config_manager: ConfigurationManager):
+    config = config_manager.get_config("cltl.chat-ui.events")
+    topic_utt = config.get("topic_utterance")
 
+    app = flask.Flask(__name__)
 
-api.components.schema("ExampleInput", schema=class_schema(ExampleInput))
-api.components.schema("ExampleOutput", schema=class_schema(ExampleOutput))
+    @app.route('/rest/chat/<chat_id>', methods=['GET', 'POST'])
+    def utterances(chat_id: str):
+        if flask.request.method == 'GET':
+            start = flask.request.args.get('start', type=int)
+            end = flask.request.args.get('end', type=int)
+            try:
+                utterances = chat.get_utterances(chat_id, start=start, end=end)
+                responses = [utterance.text for utterance in utterances]
 
+                return jsonify(responses)
+            except ValueError:
+                return Response(status=404)
+        if flask.request.method == 'POST':
+            speaker = flask.request.args.get('speaker', default="UNKNOWN", type=str)
+            text = flask.request.get_data(as_text=True)
+            utterance = Utterance(chat_id, speaker, text)
+            chat.append(utterance)
+            logging.info("XXX publish")
+            event_bus.publish(topic_utt, Event.for_payload(utterance))
+            logging.info("XXX published")
 
-@api.path("/template/api/foo/bar")
-def foo_bar(input):
-    """Short Description included in OpenAPI spec
+            return ""
 
-    A longer description can go here.
+    @app.route('/rest/chat/<chat_id>/<seq>', methods=['GET'])
+    def utterance(chat_id: str, seq: int) -> str:
+        return chat.get_utterance(chat_id, seq).text
 
-    The yaml snippet below is included in the OpenAPI spec for the endpoint:
-    ---
-    get:
-      operationId: rest.endpoint.foo_bar
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExampleOutput'
-          description: Get foo bars
-      parameters:
-      - in: query
-        name: times
-        schema:
-          $ref: '#/components/schemas/ExampleInput'
-    """
-    return DummyExampleComponent().foo_bar(input)
+    @app.route('/rest/urlmap')
+    def url_map():
+        return str(app.url_map)
 
-
-if __name__ == '__main__':
-    with open("template_spec.yaml", "w") as f:
-        f.write(api.to_yaml())
+    return app

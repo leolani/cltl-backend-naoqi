@@ -1,12 +1,10 @@
 Flask
 
 connexion
-apispec[yaml]
 marshmallow
 marshmallow-dataclass
 PyYAML
 
-asyncapi
 typer
 uvicorn
 apidaora

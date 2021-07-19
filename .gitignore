@@ -1,3 +1,5 @@
+src/rest/static/chat-bubble
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
