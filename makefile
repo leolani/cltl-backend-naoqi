@@ -33,7 +33,7 @@ src/rest/static/chat-bubble:
 	$(info Download $(chat_bubble))
 	@mkdir src/rest/static/chat-bubble
 	@wget -qO- $(chat_bubble) | \
-	        tar xvz - -C src/rest/static/chat-bubble --strip-components 1 \
+	        tar -xvzf - -C src/rest/static/chat-bubble --strip-components 1 \
 	                chat-bubble-$(chat_bubble_version)/component
 
 install: docker
