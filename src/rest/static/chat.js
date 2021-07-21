@@ -18,7 +18,6 @@ $(document).ready(function() {
     }
 
     var client_id = makeid();
-    var length = 0;
 
     var chatWindow = new Bubbles(
         document.getElementById("chat"),
@@ -28,15 +27,13 @@ $(document).ready(function() {
                 input = chatObject.input;
 
                 $.post(rest_path + "/chat/" + client_id, input);
-                length += 1;
             },
         }
     );
 
     var poll = function () {
-        $.get(rest_path + "/chat/" + client_id + "?start=" + length)
+        $.get(rest_path + "/chat/" + client_id)
             .done(function (data) {
-                length += data.length;
                 chatWindow.talk({
                         talk: {
                             says: data,

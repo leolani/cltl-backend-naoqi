@@ -5,15 +5,15 @@ from cltl.combot.infra.event.api import Event, EventBus
 from cltl.combot.infra.resource import ResourceManager
 from cltl.combot.infra.topic_worker import TopicWorker
 
-from cltl.chatui.api import Chat, Utterance
+from cltl.chatui.api import ResponseCache, Utterance
 
 logger = logging.getLogger(__name__)
 
 
 class ResponseWorker(TopicWorker):
-    def __init__(self, chat: Chat, event_bus: EventBus, resource_manager: ResourceManager, config_manager: ConfigurationManager,
+    def __init__(self, response_cache: ResponseCache, event_bus: EventBus, resource_manager: ResourceManager, config_manager: ConfigurationManager,
                  name: str = None) -> None:
-        self._chat = chat
+        self._response_cache = response_cache
 
         config = config_manager.get_config("cltl.chat-ui")
         self._name = name if name else config.get("name")
@@ -27,4 +27,4 @@ class ResponseWorker(TopicWorker):
 
     def process(self, event: Event) -> None:
         response = Utterance(event.payload.chat_id, self._agent, event.payload.text)
-        self._chat.append(response)
+        self._response_cache.append(response)

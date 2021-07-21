@@ -1,12 +1,12 @@
 import logging.config
 
+from flask import Flask
+
+from cltl.chatui.api import ResponseCache
+from cltl.chatui.memory import MemoryResponseCache
 from cltl.combot.infra.event.kombu import KombuEventBusContainer
 from cltl.combot.infra.event.memory import SynchronousEventBusContainer
 from cltl.combot.infra.topic_worker import TopicWorker
-from flask import Flask
-
-from cltl.chatui.api import Chat
-from cltl.chatui.memory import MemoryChat
 from rest.endpoint import create_app
 
 logging.config.fileConfig('config/logging.config')
@@ -33,22 +33,22 @@ else:
 class Application(ApplicationContainer):
     @property
     @singleton
-    def chat(self) -> Chat:
-        return MemoryChat()
+    def response_cache(self) -> ResponseCache:
+        return MemoryResponseCache()
 
     @property
     @singleton
     def consumer(self) -> TopicWorker:
-        return ResponseWorker(self.chat, self.event_bus, self.resource_manager, self.config_manager)
+        return ResponseWorker(self.response_cache, self.event_bus, self.resource_manager, self.config_manager)
 
     @property
     @singleton
     def backend(self) -> Flask:
-        return create_app(self.chat, self.event_bus, self.config_manager)
+        return create_app(self.response_cache, self.event_bus, self.config_manager)
 
     def run(self):
         self.consumer.start()
-        self.backend.run(host="0.0.0.0", threaded=False, processes=1)
+        self.backend.run(host="0.0.0.0")
 
 
 if __name__ == '__main__':

@@ -1,27 +1,35 @@
 from collections import defaultdict
+from queue import Empty, Queue, Full
+from threading import Lock
 from typing import Iterable
 
-from cltl.chatui.api import Chat, Utterance
+from cltl.chatui.api import ResponseCache, Utterance
 
 
-class MemoryChat(Chat):
+class MemoryResponseCache(ResponseCache):
     def __init__(self):
-        self._chats = defaultdict(list)
+        self._chats = dict()
+        self._lock = Lock()
 
     def append(self, utterance: Utterance) -> None:
-        chat = self._chats[utterance.chat_id]
-        chat.append(utterance)
+        try:
+            self._chats[utterance.chat_id].put(utterance)
+        except KeyError:
+            with self._lock:
+                if not utterance.chat_id in self._chats:
+                    self._chats[utterance.chat_id] = Queue()
+            self.append(utterance)
 
-    def get_utterances(self, chat_id: str, start: int = None, end: int = None) -> Iterable[Utterance]:
+    def get_utterances(self, chat_id: str) -> Iterable[Utterance]:
         if not chat_id in self._chats:
             raise ValueError("No chat with id " + chat_id)
 
         chat = self._chats[chat_id]
+        responses = []
+        while True:
+            try:
+                responses.append(chat.get_nowait())
+            except Empty:
+                break
 
-        start_idx = start if start is not None else 0
-        end_idx = end if end is not None else len(chat)
-
-        return chat[start_idx:end_idx]
-
-    def get_utterance(self, chat_id: str, seq: int) -> str:
-        return self._chats[chat_id][seq]
+        return responses

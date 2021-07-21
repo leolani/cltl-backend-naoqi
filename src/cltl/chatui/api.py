@@ -10,12 +10,9 @@ class Utterance:
     text: str
 
 
-class Chat(abc.ABC):
-    def get_utterances(self, chat_id: str, start: int = None, end: int = None) -> Iterable[str]:
+class ResponseCache(abc.ABC):
+    def append(self, utterances: Iterable[Utterance]):
         raise NotImplementedError("")
 
-    def get_utterance(self, chat_id: str, seq: int) -> Utterance:
-        raise NotImplementedError("")
-
-    def append(self, utterance: Utterance) -> None:
+    def get_utterances(self, chat_id: str):
         raise NotImplementedError("")
