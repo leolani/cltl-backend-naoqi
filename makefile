@@ -21,9 +21,9 @@ chat_bubble = https://github.com/dmitrizzle/chat-bubble/archive/refs/tags/v$(cha
 include util/make/makefile.base.mk
 include util/make/makefile.py.base.mk
 include util/make/makefile.git.mk
+include util/make/makefile.component.mk
 
 
-# Don't use makefile.component.mk as we are building two docker images
 clean: py-clean
 	rm -rf src/rest/static/chat-bubble
 
@@ -35,9 +35,3 @@ src/rest/static/chat-bubble:
 	@wget -qO- $(chat_bubble) | \
 	        tar -xvzf - -C src/rest/static/chat-bubble --strip-components 1 \
 	                chat-bubble-$(chat_bubble_version)/component
-
-install: docker
-
-.PHONY: docker
-docker:
-	DOCKER_BUILDKIT=1 docker build -t "cltl/cltl-chat-ui:$(project_version)" -f Dockerfile .
