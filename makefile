@@ -25,13 +25,13 @@ include util/make/makefile.component.mk
 
 
 clean: py-clean
-	rm -rf src/rest/static/chat-bubble
+	rm -rf src/chatui_app/rest/static/chat-bubble
 
-build: src/rest/static/chat-bubble py-install
+build: src/chatui_app/rest/static/chat-bubble py-install
 
-src/rest/static/chat-bubble:
+src/chatui_app/rest/static/chat-bubble:
 	$(info Download $(chat_bubble))
-	@mkdir src/rest/static/chat-bubble
+	@mkdir src/chatui_app/rest/static/chat-bubble
 	@wget -qO- $(chat_bubble) | \
-	        tar -xvzf - -C src/rest/static/chat-bubble --strip-components 1 \
+	        tar -xvzf - -C src/chatui_app/rest/static/chat-bubble --strip-components 1 \
 	                chat-bubble-$(chat_bubble_version)/component
