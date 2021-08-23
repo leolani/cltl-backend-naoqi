@@ -1,5 +1,3 @@
-# cltl-stt
+# cltl-asr
 
-speech to text service.
-
-We can use either external APIs or our own API.
+Speech to text service for Leolani.
