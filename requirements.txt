@@ -1,0 +1,9 @@
+numpy
+
+git+https://github.com/huggingface/datasets.git
+git+https://github.com/huggingface/transformers.git
+cffi
+importlib_resources
+jiwer
+sounddevice
+soundfile
