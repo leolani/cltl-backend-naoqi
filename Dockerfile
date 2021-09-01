@@ -2,7 +2,7 @@
 
 FROM python:3.9
 
-WORKDIR /cltl-chatui
+WORKDIR /cltl-asr
 COPY src requirements.txt makefile ./
 COPY config ./config
 COPY util ./util
