@@ -27,10 +27,10 @@ class Wav2Vec2ASR(ASR):
         if sampling_rate != self.sampling_rate:
             raise ValueError(f"Unsupported sampling rate: {sampling_rate}, expected {self.sampling_rate}")
 
-        if len(audio.shape) == 1 or audio.shape[1] == 1:
+        if audio.ndim == 1 or audio.shape[1] == 1:
             return audio.squeeze()
 
-        if len(audio.shape) > 2 or audio.shape[1] > 2:
+        if audio.ndim > 2 or audio.shape[1] > 2:
             raise ValueError(f"audio must have at most two channels, shape was {audio.shape}")
 
         return np.mean(audio, axis=1).squeeze()

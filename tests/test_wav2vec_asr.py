@@ -34,4 +34,4 @@ class TestWav2Vec2ASR(unittest.TestCase):
             speech_array, sampling_rate = sf.read(wav)
 
         transcript = self.asr.speech_to_text(speech_array, sampling_rate)
-        self.assertEqual("IT'S HEALTHIER TO COOK WITHOUT SUGAR", transcript)
+        self.assertEqual("IT'S HEALTHIER TO COOK WITHOUT SUGAR", transcript.upper())
