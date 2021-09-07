@@ -1,8 +1,9 @@
-git+https://github.com/huggingface/datasets.git
-git+https://github.com/huggingface/transformers.git
+# git+https://github.com/huggingface/datasets.git
+transformers==4.10.0
 cffi==1.14.6
 importlib_resources==5.2.2
 jiwer==2.2.0
 numpy==1.19.5
 sounddevice==0.4.2
 soundfile==0.10.3.post1
+torch==1.9.0
