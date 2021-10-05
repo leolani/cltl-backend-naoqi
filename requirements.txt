@@ -9,7 +9,6 @@ soundfile
 torch
 
 # app
-websockets
 requests
 flask
 werkzeug
