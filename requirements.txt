@@ -1,3 +1,5 @@
+.
+
 # git+https://github.com/huggingface/datasets.git
 transformers
 cffi
@@ -7,6 +9,10 @@ numpy
 sounddevice
 soundfile
 torch
+
+# cltl
+cltl.backend
+cltl.vad
 
 # app
 requests
