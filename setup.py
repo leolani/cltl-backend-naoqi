@@ -11,7 +11,7 @@ setup(
     version=version,
     package_dir={'': 'src'},
     packages=find_namespace_packages(include=['cltl.*'], where='src'),
-    data_files=[('version.txt', ['version.txt'])],
+    data_files=[('VERSION', ['VERSION'])],
     url="https://github.com/leolani/cltl-asr",
     license='MIT License',
     author='CLTL',
@@ -20,5 +20,5 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires='>=3.8',
-    install_requires=[],
+    install_requires=['cltl.combot', 'emissor'],
 )
