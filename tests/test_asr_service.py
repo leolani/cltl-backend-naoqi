@@ -26,6 +26,7 @@ def test_source(start, audio_started, audio_ended):
         def __init__(self, url, offset, length):
             self.offset = offset
 
+        @property
         def audio(self) -> Iterable[np.array]:
             wait(start)
             yield from [frame, frame]
@@ -54,8 +55,7 @@ def test_source(start, audio_started, audio_ended):
 
 class DummyASR(ASR):
     def speech_to_text(self, audio: np.array, sampling_rate: int) -> str:
-        audio = [f for f in audio]
-        return "test transcript" if len(audio) == 4 and np.array_equal(audio[0], frame) else None
+        return "test transcript" if len(audio) == 4 * 16 and np.array_equal(audio[:16], frame) else None
 
 
 class TestASR(unittest.TestCase):

@@ -2,6 +2,7 @@ import logging
 import uuid
 from typing import Callable
 
+import numpy as np
 import time
 from cltl.backend.api.storage import STORAGE_SCHEME
 from cltl.backend.source.client_source import ClientAudioSource
@@ -68,7 +69,7 @@ class AsrService:
         url = f"{STORAGE_SCHEME}:{Modality.AUDIO.name.lower()}/{segment.container_id}"
 
         with self._audio_loader(url, segment.start, segment.stop - segment.start) as source:
-            transcript = self._asr.speech_to_text(source.audio(), source.rate)
+            transcript = self._asr.speech_to_text(np.concatenate(tuple(source.audio)), source.rate)
 
         asr_event = self._create_payload(transcript, payload)
         self._event_bus.publish(self._asr_topic, Event.for_payload(asr_event))
