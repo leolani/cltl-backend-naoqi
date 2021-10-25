@@ -1,11 +1,10 @@
 import abc
-from typing import Iterable
 
 import numpy as np
 
 
 class ASR(abc.ABC):
-    def speech_to_text(self, audio: np.array, sampling_rate: int) -> str:
+    def speech_to_text(self, audio: np.ndarray, sampling_rate: int) -> str:
         """
         Transcribe the provided audio sample to text.
 
