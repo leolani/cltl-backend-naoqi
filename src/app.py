@@ -5,7 +5,7 @@ import os
 
 import qi
 
-from cltl.host.server import BackendServer
+from cltl.server import BackendServer
 from cltl.naoqi.api.camera import CameraResolution
 from cltl.naoqi.audio_source import NAOqiMicrophoneIndex
 

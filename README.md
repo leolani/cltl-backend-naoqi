@@ -44,7 +44,7 @@ To run the docker image use:
 It is mandatory to provide the IP of the Pepper robot in the `CLTL_NAOQI_IP` environment variable. Further
 configurations can be set through environment variables, for a list run
 
-    docker run --rm -it cltl-backend-naoqi python server.py --help
+    docker run --rm -it cltl-backend-naoqi python app.py --help
 
 ## Contributing
 
