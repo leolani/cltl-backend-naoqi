@@ -14,15 +14,15 @@ logger = logging.getLogger(__name__)
 
 class Env(enum.Enum):
     CLTL_MIC_IDX = 0
-    CLTL_MIC_BUFFER = 3
-    CLTL_MIC_FRAME_DURATION = 4
-    CLTL_CAM_RATE = 5
-    CLTL_CAM_RES = 6
-    CLTL_LANG = 8
-    CLTL_NAOQI_IP = 9
-    CLTL_NAOQI_PORT = 10
-    CLTL_PORT = 11
-    CLTL_LOG_LEVEL = 12
+    CLTL_MIC_BUFFER = 1
+    CLTL_MIC_FRAME_DURATION = 2
+    CLTL_CAM_RATE = 3
+    CLTL_CAM_RES = 4
+    CLTL_TTS_SPEED = 5
+    CLTL_NAOQI_IP = 6
+    CLTL_NAOQI_PORT = 7
+    CLTL_PORT = 8
+    CLTL_LOG_LEVEL = 9
 
 
 def env_or_default(env_var, default):
@@ -58,6 +58,9 @@ def main():
     parser.add_argument('--cam_rate', type=int,
                         default=env_or_default(Env.CLTL_CAM_RATE, 2),
                         help="Camera rate to use, < 30fps, recommended for QVGA: < 11, VGA < 2.5. Alternatively set " + Env.CLTL_CAM_RATE.name)
+    parser.add_argument('--tts_speed', type=int,
+                        default=env_or_default(Env.CLTL_TTS_SPEED, 80),
+                        help="Text speed.. Alternatively set " + Env.CLTL_TTS_SPEED.name)
     parser.add_argument('--naoqi_ip', type=str, required=True,
                         help="IP of the robot. Alternatively set " + Env.CLTL_NAOQI_IP.name)
     parser.add_argument('--naoqi_port', type=int,
@@ -82,7 +85,7 @@ def main():
     channels = 1
     server = BackendServer(naoqi_app.session, rate, channels, args.frame_duration * rate // 1000,
                            args.mic_index, args.mic_buffer,
-                           CameraResolution[args.resolution.upper()], args.cam_rate)
+                           CameraResolution[args.resolution.upper()], args.cam_rate, args.tts_speed)
     server.run(host="0.0.0.0", port=args.port)
 
 

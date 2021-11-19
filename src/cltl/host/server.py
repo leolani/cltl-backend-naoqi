@@ -2,12 +2,13 @@ import logging
 
 import flask
 import numpy as np
-from flask import Flask, Response, stream_with_context, jsonify
+from flask import Flask, Response, stream_with_context, jsonify, request
 from flask import g as app_context
 from flask.json import JSONEncoder
 
 from cltl.naoqi.audio_source import NAOqiAudioSource
 from cltl.naoqi.image_source import NAOqiImageSource
+from cltl.naoqi.tts_output import NAOqiTextToSpeech
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +24,10 @@ class NumpyJSONEncoder(JSONEncoder):
 
 class BackendServer:
     def __init__(self, naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer,
-                 camera_resolution, camera_rate):
+                 camera_resolution, camera_rate, tts_speed):
         self._mic = NAOqiAudioSource(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer)
         self._camera = NAOqiImageSource(naoqi_session, camera_resolution, camera_rate)
+        self._tts = NAOqiTextToSpeech(naoqi_session, tts_speed)
 
         self._sampling_rate = sampling_rate
         self._channels = channels
@@ -41,7 +43,8 @@ class BackendServer:
         self._app = Flask(__name__)
         self._app.json_encoder = NumpyJSONEncoder
 
-        @self._app.route("/image")
+        # TODO Change to /image here and in the backend
+        @self._app.route("/video")
         def capture():
             mimetype_with_resolution = "application/json; resolution=" + str(self._camera.resolution.name)
 
@@ -70,6 +73,14 @@ class BackendServer:
             stream = stream_with_context(audio_stream(self._mic))
 
             return Response(stream, mimetype=mime_type)
+
+        # TODO support language and animations
+        @self._app.route("/text", methods=['POST'])
+        def tts():
+            text = request.data
+            self._tts.consume(text)
+
+            return Response(status=200)
 
         @self._app.after_request
         def set_cache_control(response):
