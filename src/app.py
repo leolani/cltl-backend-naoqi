@@ -74,7 +74,7 @@ def main():
     logger.info("Starting webserver with args: %s", args)
 
     naoqi_url = "tcp://{}:{}".format(args.naoqi_ip, args.naoqi_port)
-    naoqi_app = qi.Application(["NAOqi Backend", "--qi-url=" + naoqi_url ])
+    naoqi_app = qi.Application(["NAOqiBackend", "--qi-url=" + naoqi_url ])
     try:
         naoqi_app.start()
     except RuntimeError as e:
