@@ -47,7 +47,7 @@ class NAOqiMicrophoneIndex(enum.IntEnum):
     REAR = 4
 
 
-class NAOqiAudioSource(AudioSource):
+class NAOqiAudioSource(AudioSource, object):
     SERVICE = "ALAudioDevice"
 
     def __init__(self, session, rate, channels, frame_size, index, buffer=4):
@@ -66,6 +66,8 @@ class NAOqiAudioSource(AudioSource):
         index: NAOqiMicrophoneIndex or int
             Which Microphone to Use
         """
+        super(NAOqiAudioSource, self).__init__()
+
         self.id = str(uuid.uuid4())[:6]
 
         self._rate = rate
