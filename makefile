@@ -4,7 +4,7 @@ project_dependencies :=
 
 git_remote ?= https://github.com/leolani
 
-docker_tag = cltl-backend-naoqi
+docker_tag = cltl/cltl-backend-naoqi
 
 
 include util/make/makefile.base.mk
