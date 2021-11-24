@@ -2,12 +2,12 @@
 # -*- encoding: UTF-8 -*-
 
 """Example: Get Signal from Front Microphone & Calculate its rms Power"""
-import qi
 
+
+import qi
 import argparse
 import sys
 import time
-
 import numpy as np
 
 
@@ -58,7 +58,7 @@ class SoundProcessingModule(object):
             self.micFront=self.convertStr2SignedInt(inputBuffer)
             #compute the rms level on front mic
             rmsMicFront = self.calcRMSLevel(self.micFront)
-            print("rms level mic front = " + str(rmsMicFront))
+            print "rms level mic front = " + str(rmsMicFront)
         else :
             self.isProcessingDone=True
 
@@ -91,7 +91,6 @@ class SoundProcessingModule(object):
         return signedData
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default="127.0.0.1",
@@ -109,5 +108,5 @@ if __name__ == "__main__":
                "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
     MySoundProcessingModule = SoundProcessingModule(app)
-    app.session.registerService(MySoundProcessingModule.module_name, MySoundProcessingModule)
+    app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
     MySoundProcessingModule.startProcessing()

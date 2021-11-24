@@ -37,9 +37,12 @@ if __name__ == "__main__":
                         help="Naoqi port number")
 
     args = parser.parse_args()
+
+    module_name = "SoundProcessingModule"
+
     try:
         connection_url = "tcp://" + args.ip + ":" + str(args.port)
-        app = qi.Application(["SoundProcessingModule", "--qi-url=" + connection_url])
+        app = qi.Application([module_name, "--qi-url=" + connection_url])
     except RuntimeError as e:
         print ("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) +".\n"
                "Please check your script arguments. Run with -h option for help. " + str(e))
@@ -51,18 +54,18 @@ if __name__ == "__main__":
         app.start()
         session = app.session
         audio_service = session.service("ALAudioDevice")
-        app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
+        app.session.registerService(module_name, MySoundProcessingModule)
     except Exception as e:
         print("Failed to start: ", str(e))
         raise e
 
-    audio_service.setClientPreferences("SoundProcessingModule", 16000, 3, 0)
-    audio_service.subscribe("SoundProcessingModule")
+    audio_service.setClientPreferences(module_name, 16000, 3, 0)
+    audio_service.subscribe(module_name)
 
     # Get the service ALAudioDevice.
 
-    app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
+    app.session.registerService(module_name, MySoundProcessingModule)
 
     time.sleep(15)
 
-    audio_service.unsubscribe("SoundProcessingModule")
+    audio_service.unsubscribe(module_name)
