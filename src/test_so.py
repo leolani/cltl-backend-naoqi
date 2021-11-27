@@ -14,7 +14,6 @@ testModule = TestModule()
 
 app.start()
 session = app.session
-session.listen("tcp://0.0.0.0:9558")
 
 session = app.session.services()
 
