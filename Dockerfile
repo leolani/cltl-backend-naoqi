@@ -24,6 +24,8 @@ WORKDIR cltl-naoqui-backend
 COPY requirements.txt ./requirements.txt
 RUN pip install pip==20.3.4 && pip install -r requirements.txt
 
+RUN apt-get update && apt-get install -y lsof
+
 COPY src ./
 COPY tests ./tests
 
