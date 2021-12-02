@@ -27,4 +27,4 @@ RUN pip install pip==20.3.4 && pip install -r requirements.txt
 COPY src ./
 COPY tests ./tests
 
-CMD python app.py --naoqi_ip "$CLTL_NAOQI_IP"
+CMD python -m cltl.naoqi --naoqi_ip "$CLTL_NAOQI_IP"

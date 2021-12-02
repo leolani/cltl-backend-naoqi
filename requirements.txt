@@ -3,3 +3,7 @@ numpy==1.16.2
 flask==0.12.5
 click==7.0
 enum34==1.1.10
+jinja2==2.10.3
+flask==0.12.5
+MarkupSafe==1.1.1
+itsdangerous==1.1.0
