@@ -1,20 +1,25 @@
 #!/bin/bash
 
+wgetcmd="wget --no-use-server-timestamps"
+
+
 mkdir libs
 cd libs
 
-wget https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz
-wget https://files.pythonhosted.org/packages/c3/1d/1c0761d9365d166dc9d882a48c437111d22b0df564d6d5768045d9a51fd0/Werkzeug-0.16.1.tar.gz
-wget https://files.pythonhosted.org/packages/41/96/8d1d3f0f160512d637c1aeaeddf4039525ee0eb17cf5be0c1eca7de6bd76/virtualenv-13.1.2.tar.gz
-wget https://files.pythonhosted.org/packages/32/57/3c33fe153ea008e9e0202eb028972178337c55777686aac03f41ade671f8/Flask-0.12.5.tar.gz
-wget https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz
-wget https://files.pythonhosted.org/packages/68/1a/f27de07a8a304ad5fa817bbe383d1238ac4396da447fa11ed937039fa04b/itsdangerous-1.1.0.tar.gz
-wget https://files.pythonhosted.org/packages/11/c4/2da1f4952ba476677a42f25cd32ab8aaf0e1c0d0e00b89822b835c7e654c/enum34-1.1.10.tar.gz
-wget https://files.pythonhosted.org/packages/f8/5c/f60e9d8a1e77005f664b76ff8aeaee5bc05d0a91798afd7f53fc998dbc47/Click-7.0.tar.gz
+# Preserve the order
+#$wgetcmd https://files.pythonhosted.org/packages/67/ab/41e4b42e0519d868347d2cf1051a05ce0170632039c053dee8ffe8b43b0b/numpy-1.8.2.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/b7/6f/24647f014eef9b67a24adfcbcd4f4928349b4a0f8393b3d7fe648d4d2de3/numpy-1.16.6.zip
+$wgetcmd https://files.pythonhosted.org/packages/11/c4/2da1f4952ba476677a42f25cd32ab8aaf0e1c0d0e00b89822b835c7e654c/enum34-1.1.10.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/f8/5c/f60e9d8a1e77005f664b76ff8aeaee5bc05d0a91798afd7f53fc998dbc47/Click-7.0.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/68/1a/f27de07a8a304ad5fa817bbe383d1238ac4396da447fa11ed937039fa04b/itsdangerous-1.1.0.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/c3/1d/1c0761d9365d166dc9d882a48c437111d22b0df564d6d5768045d9a51fd0/Werkzeug-0.16.1.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/32/57/3c33fe153ea008e9e0202eb028972178337c55777686aac03f41ade671f8/Flask-0.12.5.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/d9/bb/c1372a0f3718b51553ead98540e3b2a2e81e54440dfafb589eb4b00650eb/cltl.backend-naoqi-0.0.dev4.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/41/96/8d1d3f0f160512d637c1aeaeddf4039525ee0eb17cf5be0c1eca7de6bd76/virtualenv-13.1.2.tar.gz
 
 cd ..
-
-ls libs | grep -v virtualenv | grep -v requirements | { while read i; do echo "file:`pwd`/libs/$i"; done } > requirements.txt
 
 
 pip install --user virtualenv
@@ -22,4 +27,8 @@ pip install --user virtualenv
 python -m virtualenv venv
 source venv/bin/activate
 
-pip install -r requirements.txt
+ls -tr libs | grep -v virtualenv | grep -v requirements | {
+  while read i;
+  do pip install "libs/$i";
+  done
+}
