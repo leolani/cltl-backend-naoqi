@@ -80,12 +80,14 @@ We need to figure out a way run the backend at startup.
 
 ## Run the backend Docker container
 
-**At the current moment the instructions below do not work, as some services registered with the qi framework
-are not visible to the ALAudioDevice Module when we run inside th Docker container.**
+**At the current moment the instructions below only work on LINUX, as the `--network host`
+option for Docker is only available on LINUX and some services registered with the qi framework
+are not visible to the ALAudioDevice Module when we run inside the Docker container with
+a bridge network.**
 
 To run the docker image use:
 
-    docker run --rm -it -e CLTL_NAOQI_IP="192.0.0.1" -p 8000:8000 cltl/cltl-backend-naoqi
+    docker run --rm -it -e CLTL_NAOQI_IP="192.0.0.1" --network host cltl/cltl-backend-naoqi
 
 It is mandatory to provide the IP of the Pepper robot in the `CLTL_NAOQI_IP` environment variable. Further
 configurations can be set through environment variables, for a list run
