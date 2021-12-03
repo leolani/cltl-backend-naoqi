@@ -106,6 +106,15 @@ curl <backend ip>/audio
 curl --data "Hallo Stranger!" <backend ip>/text
 ```
 
+## Unit test
+
+The unit tests in this repository require the NAOqi SDK and Python 2.7 to be installed.
+They are, however, included in the Docker image provided by this repository and can be run with:
+
+    make build
+    docker run --rm -it cltl/cltl-backend-naoqi python -m unittest discover
+
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
