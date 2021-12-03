@@ -68,6 +68,7 @@ class NAOqiAudioSource(AudioSource):
         """
         self.id = str(uuid.uuid4())[:6]
 
+        self._index = index
         self._rate = rate
         self._channels = channels
         self._frame_size = frame_size
@@ -76,16 +77,23 @@ class NAOqiAudioSource(AudioSource):
         self._start_time = None
         self._time = None
 
-        self._service = session.service(NAOqiAudioSource.SERVICE)
-        session.registerService(self.__class__.__name__, self)
-        self._service.setClientPreferences(self.__class__.__name__, rate, int(index), 0)
-        self._service.subscribe(self.__class__.__name__)
+        self._session = session
+        self._service = None
 
         self._audio_queue = Queue(buffer)
         self._audio_generator = None
         self._buffer_size = buffer
 
         logger.debug("Booted")
+
+    def start(self):
+        self._service = self._session.service(NAOqiAudioSource.SERVICE)
+        self._session.registerService(self.__class__.__name__, self)
+        self._service.setClientPreferences(self.__class__.__name__, self._rate, int(self._index), 0)
+        self._service.subscribe(self.__class__.__name__)
+
+    def stop(self):
+        self._service.unsubscribe(self.__class__.__name__)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._audio_generator.close()

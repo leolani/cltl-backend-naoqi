@@ -105,6 +105,8 @@ class NAOqiImageSource(ImageSource):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._service.unsubscribe(self._client)
+        self._service = None
+        self._motion = None
 
     @property
     def resolution(self):

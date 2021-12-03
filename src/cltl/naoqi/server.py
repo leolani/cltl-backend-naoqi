@@ -98,4 +98,8 @@ class BackendServer:
         return self._app
 
     def run(self, host, port):
-        self.app.run(host=host, port=port)
+        self._mic.start()
+        try:
+            self.app.run(host=host, port=port)
+        finally:
+            self._mic.stop()

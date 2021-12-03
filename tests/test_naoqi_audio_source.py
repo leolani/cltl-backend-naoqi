@@ -75,6 +75,8 @@ class NAOqiAudioSourceTest(unittest.TestCase):
 
     def test_source(self):
         source = NAOqiAudioSource(DummySession(), 1, 1, 10, 1)
+        source.start()
+
         done = Event()
 
         def feed_mic():
