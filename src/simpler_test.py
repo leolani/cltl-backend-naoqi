@@ -6,15 +6,6 @@ import qi
 
 
 class AudioTestModule(object):
-    def __init__(self, session):
-        self._service = session.service("ALAudioDevice")
-        session.registerService(self.__class__.__name__, self)
-        self._service.setClientPreferences(self.__class__.__name__, 16000, 3, 0)
-        self._service.subscribe(self.__class__.__name__)
-
-    def stop(self):
-        self._service.unsubscribe(self.__class__.__name__)
-
     def processRemote(self, channels, samples, timestamp, buffer):
         # type: (int, int, Tuple[int, int], bytes) -> None
         audio = np.frombuffer(buffer, np.int16)
@@ -41,7 +32,7 @@ class ImageTest(object):
         self._service = self._session.service(SERVICE_VIDEO)
         self._motion = self._session.service(SERVICE_MOTION)
 
-    def __enter__(self):
+    def start(self):
         self._client = self._service.subscribeCameras(
             str(uuid.uuid4()),  # Random Client ID's to prevent name collision
             [0, 2],
@@ -51,7 +42,7 @@ class ImageTest(object):
 
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def stop(self):
         self._service.unsubscribe(self._client)
 
     def capture(self):
@@ -75,15 +66,25 @@ if __name__ == '__main__':
         print("Couldn't connect to robot @ {}:{}\n\tOriginal Error: {}".format("192.168.1.176", 9559, e))
 
     try:
-        audio_test = AudioTestModule(naoqi_app.session)
+        audio_service_name = "TestAudioService"
+        test_audio_service = AudioTestModule()
+
+        service = naoqi_app.session.service("ALAudioDevice")
+        naoqi_app.session.registerService(audio_service_name, test_audio_service)
+
+        service.setClientPreferences(audio_service_name, 16000, 3, 0)
+        service.subscribe(audio_service_name)
+
         time.sleep(10)
-        audio_test.stop()
+
+        service.unsubscribe(audio_service_name)
     except Exception as e:
         print("Error running audio test:", e)
 
     try:
         image_source = ImageTest(naoqi_app.session)
-        with image_source as source:
-            source.capture()
+        image_source.start()
+        image_source.capture()
+        image_source.stop()
     except Exception as e:
         print("Error running image test:", e)
