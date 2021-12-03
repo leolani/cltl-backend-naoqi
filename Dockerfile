@@ -29,4 +29,4 @@ RUN apt-get update && apt-get install -y lsof
 COPY src ./
 COPY tests ./tests
 
-CMD python app.py --naoqi_ip "$CLTL_NAOQI_IP"
+CMD python -m cltl.naoqi --naoqi_ip "$CLTL_NAOQI_IP"

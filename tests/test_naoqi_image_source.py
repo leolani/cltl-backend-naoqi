@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from cltl.naoqi.image_source import NAOqiCameraIndex, NAOqiImageSource, CameraResolution
+from cltl.naoqi.image_source import NAOqiCameraIndex, CameraResolution, NAOqiCamera
 
 
 class DummySession:
@@ -37,10 +37,10 @@ class DummyService:
 
 class NAOqiImageSourceTest(unittest.TestCase):
     def test_source(self):
-        source = NAOqiImageSource(DummySession(), CameraResolution.QQQVGA, 0.001)
+        cam = NAOqiCamera(DummySession(), CameraResolution.QQQVGA, 0.001)
 
-        with source as cam:
-            image = cam.capture()
+        with cam as source:
+            image = source.capture()
 
         self.assertEquals(CameraResolution.QQQVGA.value[::-1] + (3,), image.image.shape)
 
