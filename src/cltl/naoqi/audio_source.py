@@ -47,10 +47,55 @@ class NAOqiMicrophoneIndex(enum.IntEnum):
     REAR = 4
 
 
-class NAOqiAudioSource(AudioSource):
+class NAOqiMicrophone(object):
     SERVICE = "ALAudioDevice"
 
     def __init__(self, session, rate, channels, frame_size, index, buffer=4):
+        """
+        Initialize NAOqi Microphone.
+
+        Information on parameters can be found at:
+        http://doc.aldebaran.com/2-1/naoqi/audio/alaudiodevice.html
+
+        Parameters
+        ----------
+        session: qi.Session
+            Qi Application Session
+        rate: int
+            Microphone rate
+        index: NAOqiMicrophoneIndex or int
+            Which Microphone to Use
+        """
+        self.id = str(uuid.uuid4())[:6]
+
+        self._index = index
+        self._rate = rate
+        self._channels = channels
+        self._frame_size = frame_size
+        self._buffer_size = buffer
+
+        self._session = session
+        self._service = None
+
+    def __enter__(self):
+        audio_source = NAOqiAudioSource(self._rate, self._channels, self._frame_size, self._index, self._buffer_size)
+
+        self._service = self._session.service(NAOqiMicrophone.SERVICE)
+        self._session.registerService(NAOqiAudioSource.__name__, audio_source)
+        self._service.setClientPreferences(NAOqiAudioSource.__name__, self._rate, int(self._index), 0)
+        self._service.subscribe(NAOqiAudioSource.__name__)
+
+        logger.debug("Started NAOqiMicrophone")
+
+        return audio_source
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._service.unsubscribe(NAOqiAudioSource.__name__)
+        self._service = None
+
+
+class NAOqiAudioSource(AudioSource):
+    def __init__(self, rate, channels, frame_size, index, buffer=4):
         """
         Initialize NAOqi Microphone.
 
@@ -77,23 +122,9 @@ class NAOqiAudioSource(AudioSource):
         self._start_time = None
         self._time = None
 
-        self._session = session
-        self._service = None
-
         self._audio_queue = Queue(buffer)
         self._audio_generator = None
         self._buffer_size = buffer
-
-        logger.debug("Booted")
-
-    def start(self):
-        self._service = self._session.service(NAOqiAudioSource.SERVICE)
-        self._session.registerService(self.__class__.__name__, self)
-        self._service.setClientPreferences(self.__class__.__name__, self._rate, int(self._index), 0)
-        self._service.subscribe(self.__class__.__name__)
-
-    def stop(self):
-        self._service.unsubscribe(self.__class__.__name__)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._audio_generator.close()

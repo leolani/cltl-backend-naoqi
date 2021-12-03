@@ -51,7 +51,7 @@ SERVICE_MOTION = "ALMotion"
 HEAD_DELTA_THRESHOLD = 0.1
 
 
-class NAOqiImageSource(ImageSource):
+class NAOqiCamera(object):
     def __init__(self, session, resolution, rate):
         # type: (qi.Session, CameraResolution, int) -> None
         """
@@ -69,9 +69,6 @@ class NAOqiImageSource(ImageSource):
         index: int
             Which NAOqi Camera to use
         """
-        # Get random camera id, to prevent name collision
-        self._id = str(uuid.uuid4())
-
         self._session = session
 
         self._color_space = COLOR_SPACE['YUV422']
@@ -101,12 +98,35 @@ class NAOqiImageSource(ImageSource):
 
         logger.info("NAOqiCamera started")
 
-        return self
+        return NAOqiImageSource(self._service,
+                                self._client,
+                                self._motion,
+                                self._resolution,
+                                self._rate,
+                                self._color_space,
+                                self._color_space_3D)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._service.unsubscribe(self._client)
         self._service = None
         self._motion = None
+        self._client = None
+
+
+class NAOqiImageSource(ImageSource):
+    def __init__(self, service, client, motion, resolution, rate, color_space, color_space_3D):
+        # type: (qi.Service, qi.Service, CameraResolution, int, int, int) -> None
+        self._color_space = color_space
+        self._color_space_3D = color_space_3D
+
+        self._resolution = resolution
+        self._resolution_3D = resolution
+
+        self._rate = rate
+
+        self._service = service
+        self._client = client
+        self._motion = motion
 
     @property
     def resolution(self):

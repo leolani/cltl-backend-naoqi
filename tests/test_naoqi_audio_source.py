@@ -1,18 +1,18 @@
 import time
 import unittest
-from Queue import Queue
 from threading import Thread, Event
 
 import numpy as np
+from Queue import Queue
 
-from cltl.naoqi.audio_source import NAOqiAudioSource, reframe
+from cltl.naoqi.audio_source import reframe, NAOqiMicrophone
 
 
 class DummySession:
-    def service(self, name):
+    def service(self, *args):
         return DummyService()
 
-    def registerService(self, name, cls):
+    def registerService(self, *args):
         pass
 
 
@@ -20,7 +20,10 @@ class DummyService:
     def setClientPreferences(self, cls, rate, index, _):
         pass
 
-    def subscribe(self, naem):
+    def subscribe(self, *args):
+        pass
+
+    def unsubscribe(self, *args):
         pass
 
 
@@ -74,25 +77,24 @@ class NAOqiAudioSourceTest(unittest.TestCase):
         frame_stream.close()
 
     def test_source(self):
-        source = NAOqiAudioSource(DummySession(), 1, 1, 10, 1)
-        source.start()
+        mic = NAOqiMicrophone(DummySession(), 1, 1, 10, 1)
+        with mic as source:
+            done = Event()
 
-        done = Event()
+            def feed_mic():
+                while not done.is_set():
+                    source.processRemote(1, 1, 1, np.ones((50,), dtype=np.int16).tobytes())
+                    time.sleep(0.01)
 
-        def feed_mic():
-            while not done.is_set():
-                source.processRemote(1, 1, 1, np.ones((50,), dtype=np.int16).tobytes())
-                time.sleep(0.01)
+            feed_thread = Thread(target = feed_mic)
+            feed_thread.start()
 
-        feed_thread = Thread(target = feed_mic)
-        feed_thread.start()
+            with source as audio_source:
+                audio = [next(audio_source) for i in range(10)]
+                self.assertTrue(all(frame.shape == (10,) for frame in audio))
 
-        with source as mic:
-            audio = [next(mic) for i in range(10)]
-            self.assertTrue(all(frame.shape == (10,) for frame in audio))
-
-        done.set()
-        feed_thread.join()
+            done.set()
+            feed_thread.join()
 
 
 if __name__ == '__main__':
