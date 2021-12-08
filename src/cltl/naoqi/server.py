@@ -6,6 +6,7 @@ from flask import Flask, Response, stream_with_context, jsonify, request
 from flask import g as app_context
 from flask.json import JSONEncoder
 
+from cltl.naoqi.api.camera import Image
 from cltl.naoqi.audio_source import NAOqiMicrophone
 from cltl.naoqi.image_source import NAOqiCamera
 from cltl.naoqi.tts_output import NAOqiTextToSpeech
@@ -18,24 +19,32 @@ class NumpyJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, Image):
+            return vars(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
 
-        return super().default(obj)
+        return super(NumpyJSONEncoder, self).default(obj)
 
 
 class BackendServer:
-    def __init__(self, naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer,
-                 camera_resolution, camera_rate, tts_speed):
-        self._mic = NAOqiMicrophone(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer)
-        self._camera = NAOqiCamera(naoqi_session, camera_resolution, camera_rate)
-        self._tts = NAOqiTextToSpeech(naoqi_session, tts_speed)
-
-        self._sampling_rate = sampling_rate
-        self._channels = channels
-        self._frame_size = frame_size
+    def __init__(self, mic, camera, tts):
+        self._mic = mic
+        self._camera = camera
+        self._tts = tts
 
         self._app = None
         self._image_source = None
         self._audio_source = None
+
+    @classmethod
+    def for_session(cls, naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer,
+                 camera_resolution, camera_rate, tts_speed):
+        mic = NAOqiMicrophone(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer)
+        camera = NAOqiCamera(naoqi_session, camera_resolution, camera_rate)
+        tts = NAOqiTextToSpeech(naoqi_session, tts_speed)
+
+        return cls(mic, camera, tts)
 
     @property
     def app(self):
@@ -68,16 +77,18 @@ class BackendServer:
             if not self._audio_source:
                 return Response(status=404)
 
-            def audio_stream(mic):
-                with self._mic as mic_stream:
-                    for frame in mic_stream:
-                        yield frame
+            mic_stream = self._audio_source.start()
+
+            def audio_stream():
+                for frame in mic_stream:
+                    yield frame
 
             # Store mic in (thread-local) app-context to be able to close it.
-            app_context.mic = self._mic
+            app_context.mic = self._audio_source
 
-            mime_type = "audio/L16; rate=" + str(self._sampling_rate) + "; channels=" + str(self._channels) + "; frame_size=" + str(self._frame_size)
-            stream = stream_with_context(audio_stream(self._mic))
+            mime_type = "audio/L16; rate=" + str(self._mic.rate) + "; channels=" + \
+                        str(self._mic.channels) + "; frame_size=" + str(self._mic.frame_size)
+            stream = stream_with_context(audio_stream())
 
             return Response(stream, mimetype=mime_type)
 
@@ -113,3 +124,8 @@ class BackendServer:
 
         self._audio_source = None
         self._image_source = None
+
+    def _start_for_testing(self):
+        """Method for testing only"""
+        self._audio_source = self._mic.__enter__()
+        self._image_source = self._camera.__enter__()

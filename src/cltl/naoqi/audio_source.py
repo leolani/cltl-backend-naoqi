@@ -93,6 +93,22 @@ class NAOqiMicrophone(object):
         self._service.unsubscribe(NAOqiAudioSource.__name__)
         self._service = None
 
+    @property
+    def rate(self):
+        return self._rate
+
+    @property
+    def channels(self):
+        return self._channels
+
+    @property
+    def frame_size(self):
+        return self._frame_size
+
+    @property
+    def depth(self):
+        return 2
+
 
 class NAOqiAudioSource(AudioSource):
     def __init__(self, rate, channels, frame_size, index, buffer=4):
@@ -126,13 +142,10 @@ class NAOqiAudioSource(AudioSource):
         self._audio_generator = None
         self._buffer_size = buffer
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._audio_generator.close()
-        self._audio_generator = None
-
-        return self
-
     def __enter__(self):
+        return self.start()
+
+    def start(self):
         if self._audio_generator is not None:
             raise ValueError("Audio already open")
 
@@ -144,6 +157,21 @@ class NAOqiAudioSource(AudioSource):
                 pass
 
         self._audio_generator = reframe(self._audio_queue, self._frame_size, self._frame_size/self.rate)
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def stop(self):
+        self._audio_generator.close()
+        self._audio_generator = None
+
+    def __iter__(self):
+        return iter(self.audio)
+
+    def next(self):
+        return next(self.audio)
 
     @property
     def audio(self):
@@ -169,9 +197,10 @@ class NAOqiAudioSource(AudioSource):
     def active(self):
         return self._active
 
-    @property
-    def time(self):
-        return self._mic_time - self._start_time
+    # TODO
+    # @property
+    # def time(self):
+    #     return self._mic_time - self._start_time
 
     def processRemote(self, channels, samples, timestamp, buffer):
         # type: (int, int, Tuple[int, int], bytes) -> None
@@ -205,5 +234,5 @@ class NAOqiAudioSource(AudioSource):
         try:
             self._audio_queue.put_nowait(audio)
         except Full as e:
-            logger.warning("Dropped frame: %s", audio.shape)
+            logger.debug("Dropped frame: %s", audio.shape)
             pass
