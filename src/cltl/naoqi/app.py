@@ -83,7 +83,7 @@ def main():
 
     rate = 48000 if args.mic_index == 0 else 16000
     channels = 1
-    server = BackendServer(naoqi_app.session, rate, channels, args.frame_duration * rate // 1000,
+    server = BackendServer.for_session(naoqi_app.session, rate, channels, args.frame_duration * rate // 1000,
                            args.mic_index, args.mic_buffer,
                            CameraResolution[args.resolution.upper()], args.cam_rate, args.tts_speed)
     server.run(host="0.0.0.0", port=args.port)
