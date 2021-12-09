@@ -34,7 +34,7 @@ The robot has Text to Speech (TTS) as built-in feature. To use TTS on the robot 
 
 To build the docker image run
 
-    make build
+    make docker
 
 This will create a docker image with tag `cltl-backend-naoqi`. To verify the build was successful run
 
@@ -125,9 +125,7 @@ curl --data "Hallo Stranger!" <backend_ip:port>/text
 The unit tests in this repository require the NAOqi SDK and Python 2.7 to be installed.
 They are, however, included in the Docker image provided by this repository and can be run with:
 
-    make build
-    docker run --rm -it cltl/cltl-backend-naoqi python -m unittest discover
-
+    make test
 
 ## Contributing
 

@@ -12,8 +12,8 @@ include util/make/makefile.git.mk
 include util/make/makefile.component.mk
 
 
-.PHONY: build
-build: docker.lock
+.PHONY: docker
+docker: docker.lock
 
 
 docker.lock: src tests requirements.txt
@@ -22,5 +22,5 @@ docker.lock: src tests requirements.txt
 
 
 .PHONY: test
-test:
+test: docker
 	docker run --rm -it $(docker_tag) python -m unittest discover

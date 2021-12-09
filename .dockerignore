@@ -24,3 +24,6 @@ ENV/
 *.DS_Store
 .AppleDouble
 .LSOverride
+
+# makefile flag
+docker.lock
