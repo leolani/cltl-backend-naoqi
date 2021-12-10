@@ -21,8 +21,6 @@ class NumpyJSONEncoder(JSONEncoder):
             return obj.tolist()
         if isinstance(obj, Image):
             return vars(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
 
         return super(NumpyJSONEncoder, self).default(obj)
 
@@ -81,7 +79,7 @@ class BackendServer:
 
             def audio_stream():
                 for frame in mic_stream:
-                    yield frame
+                    yield frame.tobytes()
 
             # Store mic in (thread-local) app-context to be able to close it.
             app_context.mic = self._audio_source

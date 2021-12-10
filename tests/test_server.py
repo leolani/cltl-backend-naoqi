@@ -83,7 +83,7 @@ class BackendServerTest(unittest.TestCase):
             self.assertEqual(200, audio_response.status_code)
         audio = [frame for frame in audio_response.iter_encoded()]
 
-        np.testing.assert_array_equal(AUDIO_ARRAY, audio)
+        np.testing.assert_array_equal(AUDIO_ARRAY, [np.frombuffer(frame, dtype=np.int16) for frame in audio])
 
     def test_video(self):
         mic = TestMic()
