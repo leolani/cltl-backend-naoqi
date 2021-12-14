@@ -4,12 +4,12 @@ NaoQI Backend for the Pepper Robot.
 
 ## Functionality
 
-This repository provides a Docker container that runs an web server that supports connections of the client sources
-provided in the `cltl.backend.source.client_source` module of the
-[Leolani Backend](https://github.com/leolani/cltl-backend/).
+This repository provides a web server that supports connections of the client sources provided in the
+`cltl.backend.source.client_source` module of the [Leolani Backend](https://github.com/leolani/cltl-backend/)
+to the Pepper robot. The web server provides endpoints for Audio, Images as well as Text to Speech.
 
-The docker image provides endpoints for Audio, Images and connects to the robot through TCP to retrieve and send
-signals.
+The web server can be run on the Pepper robot directly, or from a docker image that can be built from this repository.
+Mind that the Docker image will only run on Linux due to networking issues (see below).
 
 #### Audio
 
