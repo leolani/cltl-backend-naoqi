@@ -33,7 +33,7 @@ def env_or_default(env_var, default):
 
 def main():
     logging.basicConfig(
-        level=env_or_default(Env.CLTL_LOG_LEVEL, logging.DEBUG),
+        level=env_or_default(Env.CLTL_LOG_LEVEL, logging.WARNING),
         format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
     )
