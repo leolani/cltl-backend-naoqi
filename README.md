@@ -85,6 +85,14 @@ source venv/bin/activate
 python -m cltl.naoqi --naoqi-ip 127.0.0.1 --port 8000
 ```
 
+### Configuration
+
+Additional configuration parameters can be added when starting the web server, for a comprehensive list run
+
+    python -m cltl.naoqi --help
+
+This configuration options can be either specified as command line options or environment variables.
+
 ## Run the backend Docker container
 
 **At the current moment the instructions below only work on LINUX, as the `--network host`
