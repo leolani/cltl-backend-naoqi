@@ -2,7 +2,7 @@
 
 NaoQI Backend for the Pepper Robot.
 
-## Functionality
+## Backend server
 
 This repository provides a web server that supports connections of the client sources provided in the
 `cltl.backend.source.client_source` module of the [Leolani Backend](https://github.com/leolani/cltl-backend/)
@@ -24,22 +24,6 @@ returns a JSON object corresponding to
 [cltl.backend.api.camera.Image](https://github.com/leolani/cltl-backend/blob/eliza/src/cltl/backend/api/camera.py)
 that contains the raw image data, the image dimensions and depth information. Image dimensions are also inlcude in the
 mime type header of the response.
-
-#### Text to speech
-
-The robot has Text to Speech (TTS) as built-in feature. To use TTS on the robot, send a `POST` requests to the
-`text/` (POST) endpoint with the text as payload and mime type `text/plain`. The text posted to the robot can
-be [annotated with animation instructions](http://doc.aldebaran.com/2-1/naoqi/audio/alanimatedspeech.html).
-
-## Build the backend Docker container
-
-To build the docker image run
-
-    make docker
-
-This will create a docker image with tag `cltl-backend-naoqi`. To verify the build was successful run
-
-    make test
 
 ## Run the backend on the robot
 
@@ -93,11 +77,29 @@ Additional configuration parameters can be added when starting the web server, f
 
 This configuration options can be either specified as command line options or environment variables.
 
-## Run the backend Docker container
+#### Text to speech
 
-**At the current moment the instructions below only work on LINUX, as the `--network host`
+The robot has Text to Speech (TTS) as built-in feature. To use TTS on the robot, send a `POST` requests to the
+`text/` (POST) endpoint with the text as payload and mime type `text/plain`. The text posted to the robot can
+be [annotated with animation instructions](http://doc.aldebaran.com/2-1/naoqi/audio/alanimatedspeech.html).
+
+## Backend Docker container
+
+**At the current moment running the Docker container on works on LINUX, as the `--network host`
 option for Docker is only available on LINUX and some services registered with the qi framework are not visible to the
 ALAudioDevice Module when we run inside the Docker container with a bridge network.**
+
+### Build the backend Docker container
+
+To build the docker image run
+
+    make docker
+
+This will create a docker image with tag `cltl-backend-naoqi`. To verify the build was successful run
+
+    make test
+
+### Run the backend Docker container
 
 To run the docker image use:
 
