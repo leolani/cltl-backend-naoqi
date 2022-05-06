@@ -133,7 +133,7 @@ class NAOqiImageSource(ImageSource):
         return self._resolution
 
     def capture(self):
-        image_rgb, image_3D, bounds = None, None, None
+        image_rgb, image_3D, view = None, None, None
 
         # TODO: Make sure these are the Head Yaw and Pitch at image capture time!?
         yaw, pitch = self._motion.getAngles("HeadYaw", False)[0], self._motion.getAngles("HeadPitch", False)[0]
@@ -154,9 +154,9 @@ class NAOqiImageSource(ImageSource):
                 # Bring Theta from [-PI/2,+PI/2] to [0, PI] Space
                 phi_min, phi_max = right - yaw, left - yaw
                 theta_min, theta_max = bottom + pitch + np.pi / 2, top + pitch + np.pi / 2
-                bounds = Bounds(phi_min, theta_min, phi_max, theta_max)
+                view = Bounds(phi_min, theta_min, phi_max, theta_max)
 
-        return Image(image_rgb, bounds, image_3D) if image_rgb is not None and bounds is not None else None
+        return Image(image_rgb, view, image_3D) if image_rgb is not None and view is not None else None
 
     def _yuv2rgb(self, width, height, data):
         # type: (int, int, bytes) -> np.ndarray

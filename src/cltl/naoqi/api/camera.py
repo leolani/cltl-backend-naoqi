@@ -39,14 +39,14 @@ class Image(object):
     ----------
     image: np.ndarray
         RGB Image (height, width, 3) as Numpy Array
-    bounds: Bounds
-        Image Bounds (View Space) in Spherical Coordinates (Phi, Theta)
+    view: Bounds
+        View Bounds (View Space) in Spherical Coordinates (Phi, Theta)
     depth: np.ndarray
         Image Depth (height, width) as Numpy Array
     """
-    def __init__(self, image, bounds, depth):
+    def __init__(self, image, view, depth):
         self.image = image
-        self.bounds = bounds
+        self.view = view
         self.depth = depth
 
     @property

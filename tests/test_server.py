@@ -98,7 +98,7 @@ class BackendServerTest(unittest.TestCase):
         image_json = json.loads(image_response.data)
 
         np.testing.assert_array_equal(np.ones(camera.resolution.value), image_json['image'])
-        np.testing.assert_array_equal(Bounds(*((0.0, 0.0) + camera.resolution.value)), image_json['bounds'])
+        np.testing.assert_array_equal(Bounds(*((0.0, 0.0) + camera.resolution.value)), image_json['view'])
         np.testing.assert_array_equal(np.zeros(camera.resolution.value), image_json['depth'])
 
     def test_tts(self):
