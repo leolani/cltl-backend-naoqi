@@ -52,8 +52,7 @@ class BackendServer:
         self._app = Flask(__name__)
         self._app.json_encoder = NumpyJSONEncoder
 
-        # TODO Change to /image here and in the backend
-        @self._app.route("/video")
+        @self._app.route("/image")
         def capture():
             if not self._image_source:
                 return Response(status=404)

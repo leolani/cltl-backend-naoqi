@@ -93,7 +93,7 @@ class BackendServerTest(unittest.TestCase):
         server._start_for_testing()
 
         with server.app.test_client() as client:
-            image_response = client.get("/video")
+            image_response = client.get("/image")
             self.assertEqual(200, image_response.status_code)
         image_json = json.loads(image_response.data)
 
