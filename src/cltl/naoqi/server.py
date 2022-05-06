@@ -38,8 +38,10 @@ class BackendServer:
     @classmethod
     def for_session(cls, naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer,
                  camera_resolution, camera_rate, tts_speed):
-        mic = NAOqiMicrophone(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer)
-        camera = NAOqiCamera(naoqi_session, camera_resolution, camera_rate)
+        mic = NAOqiMicrophone(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer) \
+              if sampling_rate > 0 else None
+        camera = NAOqiCamera(naoqi_session, camera_resolution, camera_rate) \
+                 if camera_rate > 0 else None
         tts = NAOqiTextToSpeech(naoqi_session, tts_speed)
 
         return cls(mic, camera, tts)
@@ -113,14 +115,20 @@ class BackendServer:
         return self._app
 
     def run(self, host, port):
-        with self._mic as audio_source, self._camera as image_source:
-            self._audio_source = audio_source
-            self._image_source = image_source
+        try:
+            if self._camera:
+                self._image_source = self._camera.__enter__()
+            if self._mic:
+                self._audio_source = self._mic.__enter__()
 
             self.app.run(host=host, port=port)
-
-        self._audio_source = None
-        self._image_source = None
+        finally:
+            if self._audio_source:
+                self._audio_source.__exit__(None, None, None)
+                self._audio_source = None
+            if self._image_source:
+                self.self._image_source.__exit__(None, None, None)
+                self.self._image_source = None
 
     def _start_for_testing(self):
         """Method for testing only"""
