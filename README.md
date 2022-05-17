@@ -45,9 +45,9 @@ Since we do not want to interfere with the Python environment on pepper, we inst
 environment. **For the installation the `scripts/download_libs.sh` and
 `scripts/install_libs.sh` scripts are provided.** The can be downloaded via
 
-        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/backend_naoqi.sh
-        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/download_libs.sh
-        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/install_libs.sh
+        wget --no-check-certificate https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/backend_naoqi.sh
+        wget --no-check-certificate https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/download_libs.sh
+        wget --no-check-certificate https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/install_libs.sh
 
 First execute the download script and then the install script.
 
