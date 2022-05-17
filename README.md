@@ -43,7 +43,15 @@ pip install --user pip-20.3.3.tar.gz
 
 Since we do not want to interfere with the Python environment on pepper, we install the package in a virutal
 environment. **For the installation the `scripts/download_libs.sh` and
-`scripts/install_libs.sh` scripts are provided.** First execute the download script on your local machine (it fails on
+`scripts/install_libs.sh` scripts are provided.** The can be downloaded via
+
+        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/backend_naoqi.sh
+        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/download_libs.sh
+        wget https://raw.githubusercontent.com/leolani/cltl-backend-naoqi/main/scripts/install_libs.sh
+
+First execute the download script and then the install script.
+
+If this fails on the robot, first execute the download script on your local machine (it fails on
 the robot due to ssl issues). This will downlaod all necessary packages to a folder called `lib/`. Then copy this folder
 to the robot using scp:
 
