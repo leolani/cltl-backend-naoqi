@@ -1,6 +1,6 @@
 #!/bin/bash
 
-wgetcmd="wget --no-use-server-timestamps --directory-prefix=libs"
+wgetcmd="wget --no-check-certificate --no-use-server-timestamps --directory-prefix=libs"
 
 # Preserve the order
 $wgetcmd https://files.pythonhosted.org/packages/67/ab/41e4b42e0519d868347d2cf1051a05ce0170632039c053dee8ffe8b43b0b/numpy-1.8.2.tar.gz
@@ -14,3 +14,4 @@ $wgetcmd https://files.pythonhosted.org/packages/c3/1d/1c0761d9365d166dc9d882a48
 $wgetcmd https://files.pythonhosted.org/packages/32/57/3c33fe153ea008e9e0202eb028972178337c55777686aac03f41ade671f8/Flask-0.12.5.tar.gz
 $wgetcmd https://files.pythonhosted.org/packages/59/21/6e5de34d711de50c54b4aa63b15e43b689c9b372aaed349b3fa13c9345e9/cltl.backend-naoqi-0.0.dev7.tar.gz
 $wgetcmd https://files.pythonhosted.org/packages/41/96/8d1d3f0f160512d637c1aeaeddf4039525ee0eb17cf5be0c1eca7de6bd76/virtualenv-13.1.2.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/ca/1e/d91d7aae44d00cd5001957a1473e4e4b7d1d0f072d1af7c34b5899c9ccdf/pip-20.3.3.tar.gz
