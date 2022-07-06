@@ -54,4 +54,8 @@ def main():
     service.setOnTouchWebviewScaleFactor(1)
     service.hide()
 
-    service.showWebview("http://" + args.server  + ":8000/chatui/static/chat.html")
+    service.showWebview("http://" + args.server)
+
+
+if __name__ == '__main__':
+    main()
