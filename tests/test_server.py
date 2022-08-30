@@ -1,3 +1,4 @@
+import base64
 import json
 import unittest
 
@@ -11,6 +12,18 @@ from cltl.naoqi.spi.image import ImageSource
 from cltl.naoqi.spi.text import TextOutput
 
 AUDIO_ARRAY = [np.ones((10,), dtype=np.int16)] * 10
+
+
+#TODO centralize
+def _deserialize_numpy(image_json):
+    if not image_json:
+        return None
+
+    data_string = image_json["data"]
+    shape = image_json["shape"]
+    dtype = image_json["dtype"]
+
+    return np.frombuffer(base64.b64decode(data_string), dtype=dtype).reshape(shape)
 
 
 class TestMic(AudioSource):
@@ -70,6 +83,8 @@ class TestTTS(TextOutput):
         self.consumed.put(text)
 
 
+
+
 class BackendServerTest(unittest.TestCase):
     def test_audio(self):
         mic = TestMic()
@@ -97,9 +112,11 @@ class BackendServerTest(unittest.TestCase):
             self.assertEqual(200, image_response.status_code)
         image_json = json.loads(image_response.data)
 
-        np.testing.assert_array_equal(np.ones(camera.resolution.value), image_json['image'])
+        image = _deserialize_numpy(image_json['image'])
+        depth = _deserialize_numpy(image_json['depth'])
+        np.testing.assert_array_equal(np.ones(camera.resolution.value), image)
         np.testing.assert_array_equal(Bounds(*((0.0, 0.0) + camera.resolution.value)), image_json['view'])
-        np.testing.assert_array_equal(np.zeros(camera.resolution.value), image_json['depth'])
+        np.testing.assert_array_equal(np.zeros(camera.resolution.value), depth)
 
     def test_tts(self):
         mic = TestMic()

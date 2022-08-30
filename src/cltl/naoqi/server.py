@@ -1,3 +1,4 @@
+import base64
 import logging
 
 import flask
@@ -6,7 +7,7 @@ from flask import Flask, Response, stream_with_context, jsonify, request
 from flask import g as app_context
 from flask.json import JSONEncoder
 
-from cltl.naoqi.api.camera import Image
+from cltl.naoqi.api.camera import Image, Bounds
 from cltl.naoqi.audio_source import NAOqiMicrophone
 from cltl.naoqi.image_source import NAOqiCamera
 from cltl.naoqi.tts_output import NAOqiTextToSpeech
@@ -18,9 +19,16 @@ logger = logging.getLogger(__name__)
 class NumpyJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
-            return obj.tolist()
+            return {
+                "__type": "np.ndarray",
+                "data": base64.b64encode(obj.tobytes()).decode('ascii'),
+                "shape": obj.shape,
+                "dtype": str(obj.dtype)
+            }
         if isinstance(obj, Image):
             return vars(obj)
+        if isinstance(obj, Bounds):
+            return [obj.x0, obj.x1, obj.y0, obj.y1]
 
         return super(NumpyJSONEncoder, self).default(obj)
 
