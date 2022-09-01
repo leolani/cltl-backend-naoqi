@@ -28,5 +28,8 @@ setup(
                       "flask",
                       "MarkupSafe",
                       "itsdangerous"
-                      ]
+                      ],
+    entry_points={
+        'console_scripts': ['leoserv = cltl.naoqi.app:main']
+    }
 )
