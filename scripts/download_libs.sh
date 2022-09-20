@@ -13,6 +13,6 @@ $wgetcmd https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494
 $wgetcmd https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz
 $wgetcmd https://files.pythonhosted.org/packages/c3/1d/1c0761d9365d166dc9d882a48c437111d22b0df564d6d5768045d9a51fd0/Werkzeug-0.16.1.tar.gz
 $wgetcmd https://files.pythonhosted.org/packages/32/57/3c33fe153ea008e9e0202eb028972178337c55777686aac03f41ade671f8/Flask-0.12.5.tar.gz
-$wgetcmd https://files.pythonhosted.org/packages/59/21/6e5de34d711de50c54b4aa63b15e43b689c9b372aaed349b3fa13c9345e9/cltl.backend-naoqi-0.0.dev7.tar.gz
+$wgetcmd https://files.pythonhosted.org/packages/92/7e/c306c62ea34bd251373f0bcd8e6b9a0859afe30a6939e6087cdc83d41660/cltl.backend-naoqi-0.0.dev8.tar.gz
 $wgetcmd https://files.pythonhosted.org/packages/41/96/8d1d3f0f160512d637c1aeaeddf4039525ee0eb17cf5be0c1eca7de6bd76/virtualenv-13.1.2.tar.gz
 
