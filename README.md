@@ -127,7 +127,7 @@ Alternatively redirect the output of the `curl` command to a file and check the 
 **When testing /video, hit `Enter` on the image to close it. When testing /audio, mind the echo..**
 
 ```shell
-curl <backend_ip:port>/video | jq -c '.image' | python -c 'import cv2; import numpy; import json; cv2.imshow("img", numpy.array(json.loads(input()), dtype=np.uint8)); cv2.waitKey(0); cv2.destroyAllWindows()'
+curl <backend_ip:port>/image
 curl -N <backend_ip:port>/audio |  play -t raw -e signed -b 16 -c 1 -r 16000 -
 curl -H "Content-Type: text/plain" --data "Hallo Stranger!" <backend_ip:port>/text
 ```
