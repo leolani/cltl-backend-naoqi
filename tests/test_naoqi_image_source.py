@@ -14,6 +14,9 @@ class DummySession:
 
 
 class DummyService:
+    def hasDepthCamera(self):
+        return True
+
     def setClientPreferences(self, cls, rate, index, _):
         pass
 
@@ -25,7 +28,7 @@ class DummyService:
 
     def getImagesRemote(self, *args, **kwargs):
         width, height = CameraResolution.QQQVGA.value
-        data = np.ones((CameraResolution.QQQVGA.value[1], CameraResolution.QQQVGA.value[0] // 2, 4,), dtype=np.uint8)
+        data = np.ones((CameraResolution.QQQVGA.value[1], CameraResolution.QQQVGA.value[0], 3,), dtype=np.uint8)
         camera = NAOqiCameraIndex.TOP
         left, top, right, bottom = (0, 0) + CameraResolution.QQQVGA.value
 

@@ -4,48 +4,42 @@ import uuid
 
 import numpy as np
 import qi
+import vision_definitions
+
 from cltl.naoqi.api.camera import Image, Bounds, CameraResolution
 from cltl.naoqi.spi.image import ImageSource
 
 logger = logging.getLogger(__name__)
 
 
-# See http://doc.aldebaran.com/2-5/naoqi/vision/alvideodevice.html?highlight=alvideodevice
 class NAOqiCameraIndex(enum.IntEnum):
-    TOP = 0
-    BOTTOM = 1
-    DEPTH = 2
+    """
+    See also:
+    http://doc.aldebaran.com/2-5/naoqi/vision/alvideodevice.html?highlight=alvideodevice
+    """
+    TOP = vision_definitions.kTopCamera
+    BOTTOM = vision_definitions.kBottomCamera
+    DEPTH = vision_definitions.kDepthCamera
 
 
 RESOLUTION_CODE = {
-    CameraResolution.NATIVE:    2,
-    CameraResolution.QQQQVGA:   8,
-    CameraResolution.QQQVGA:    7,
-    CameraResolution.QQVGA:     0,
-    CameraResolution.QVGA:      1,
-    CameraResolution.VGA:       2,
-    CameraResolution.VGA4:      3,
+    CameraResolution.NATIVE:    vision_definitions.kVGA,
+    CameraResolution.QQQQVGA:   vision_definitions.kQQQQVGA,
+    CameraResolution.QQQVGA:    vision_definitions.kQQQVGA,
+    CameraResolution.QQVGA:     vision_definitions.kQQVGA,
+    CameraResolution.QVGA:      vision_definitions.kQVGA,
+    CameraResolution.VGA:       vision_definitions.kVGA,
+    CameraResolution.VGA4:      vision_definitions.k4VGA
 }
 
-COLOR_SPACE = {
-    'kYuv': 0, 'kyUv': 1, 'kyuV': 2,
-    'Rgb':  3, 'rGb':  4, 'rgB': 5,
-    'Hsy':  6, 'hSy':  7, 'hsY': 8,
+class ColorSpace(enum.IntEnum):
+    RGB = vision_definitions.kRGBColorSpace
+    DEPTH = vision_definitions.kDepthColorSpace
 
-    'YUV422': 9,  # (Native Color)
-
-    'YUV': 10, 'RGB': 11, 'HSY': 12,
-    'BGR': 13, 'YYCbCr': 14,
-    'H2RGB': 15, 'HSMixed': 16,
-
-    'Depth': 17,        # uint16    - corrected distance from image plan (mm)
-    'XYZ': 19,          # 3float32  - voxel xyz
-    'Distance': 21,     # uint16    - distance from camera (mm)
-    'RawDepth': 23,     # uint16    - distance from image plan (mm)
-}
 
 SERVICE_VIDEO = "ALVideoDevice"
 SERVICE_MOTION = "ALMotion"
+
 
 # Only take non-blurry pictures
 HEAD_DELTA_THRESHOLD = 0.1
@@ -71,9 +65,6 @@ class NAOqiCamera(object):
         """
         self._session = session
 
-        self._color_space = COLOR_SPACE['YUV422']
-        self._color_space_3D = COLOR_SPACE['Distance']
-
         self._resolution = resolution
         self._resolution_3D = resolution
 
@@ -87,12 +78,20 @@ class NAOqiCamera(object):
         self._service = self._session.service(SERVICE_VIDEO)
         self._motion = self._session.service(SERVICE_MOTION)
 
-        # TODO Check hasDepthCamera
+        camera_indexes = [int(NAOqiCameraIndex.TOP)]
+        resolutions = [RESOLUTION_CODE[self._resolution]]
+        color_spaces = [ColorSpace.RGB.value]
+
+        if self._service.hasDepthCamera():
+            camera_indexes += [int(NAOqiCameraIndex.DEPTH)]
+            resolutions += [RESOLUTION_CODE[self._resolution_3D]]
+            color_spaces += [ColorSpace.DEPTH.value]
+
         self._client = self._service.subscribeCameras(
-            str(uuid.uuid4()),  # Random Client ID's to prevent name collision
-            [int(NAOqiCameraIndex.TOP), int(NAOqiCameraIndex.DEPTH)],
-            [RESOLUTION_CODE[self._resolution], RESOLUTION_CODE[self._resolution_3D]],
-            [self._color_space, self._color_space_3D],
+            str(uuid.uuid4()),
+            camera_indexes,
+            resolutions,
+            color_spaces,
             self._rate
         )
 
@@ -103,8 +102,7 @@ class NAOqiCamera(object):
                                 self._motion,
                                 self._resolution,
                                 self._rate,
-                                self._color_space,
-                                self._color_space_3D)
+                                bool(len(camera_indexes) > 1))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._service.unsubscribe(self._client)
@@ -114,15 +112,11 @@ class NAOqiCamera(object):
 
 
 class NAOqiImageSource(ImageSource):
-    def __init__(self, service, client, motion, resolution, rate, color_space, color_space_3D):
-        # type: (qi.Service, qi.Service, CameraResolution, int, int, int) -> None
-        self._color_space = color_space
-        self._color_space_3D = color_space_3D
-
+    def __init__(self, service, client, motion, resolution, rate, multistream):
         self._resolution = resolution
-        self._resolution_3D = resolution
 
         self._rate = rate
+        self._multistream = multistream
 
         self._service = service
         self._client = client
@@ -138,7 +132,12 @@ class NAOqiImageSource(ImageSource):
         # TODO: Make sure these are the Head Yaw and Pitch at image capture time!?
         yaw, pitch = self._motion.getAngles("HeadYaw", False)[0], self._motion.getAngles("HeadPitch", False)[0]
 
-        for image in self._service.getImagesRemote(self._client):
+        if self._multistream:
+            images = self._service.getImagesRemote(self._client)
+        else:
+            images = [self._service.getImageRemote(self._client)]
+
+        for image in images:
             # TODO: RGB and Depth Images are not perfectly synced, can they?
             width, height, _, _, _, _, data, camera, left, top, right, bottom = image
 
@@ -147,8 +146,9 @@ class NAOqiImageSource(ImageSource):
                 # TODO: Make sure Image Bounds are actually the same for RGB and Depth Camera!
                 image_3D = np.frombuffer(data, np.uint16).reshape(height, width).astype(np.float32) / 1000
             else:
-                image_rgb = self._yuv2rgb(width, height, data)
+                image_rgb =  np.frombuffer(data, np.uint8).reshape(height, width, 3)
 
+                # TODO replace by helper method from Qi Framework
                 # Calculate Image Bounds in Radians
                 # Apply Yaw and Pitch to Image Bounds
                 # Bring Theta from [-PI/2,+PI/2] to [0, PI] Space
@@ -157,39 +157,3 @@ class NAOqiImageSource(ImageSource):
                 view = Bounds(phi_min, theta_min, phi_max, theta_max)
 
         return Image(image_rgb, view, image_3D) if image_rgb is not None and view is not None else None
-
-    def _yuv2rgb(self, width, height, data):
-        # type: (int, int, bytes) -> np.ndarray
-        """
-        Convert from YUV422 to RGB Color Space
-
-        Parameters
-        ----------
-        width: int
-            Image Width
-        height: int
-            Image Height
-        data: bytes
-            Image Data
-
-        Returns
-        -------
-        image_rgb: np.ndarray
-        """
-
-        X2 = width // 2
-
-        YUV442 = np.frombuffer(data, np.uint8).reshape(height, X2, 4)
-
-        RGB = np.empty((height, X2, 2, 3), np.float32)
-        RGB[:, :, 0, :] = YUV442[..., 0].reshape(height, X2, 1)
-        RGB[:, :, 1, :] = YUV442[..., 2].reshape(height, X2, 1)
-
-        Cr = (YUV442[..., 1].astype(np.float32) - 128.0).reshape(height, X2, 1)
-        Cb = (YUV442[..., 3].astype(np.float32) - 128.0).reshape(height, X2, 1)
-
-        RGB[..., 0] += np.float32(1.402) * Cb
-        RGB[..., 1] += - np.float32(0.71414) * Cb - np.float32(0.34414) * Cr
-        RGB[..., 2] += np.float32(1.772) * Cr
-
-        return RGB.clip(0, 255).astype(np.uint8).reshape(height, width, 3)

@@ -4,7 +4,7 @@ FROM alpine as download
 
 WORKDIR python
 
-RUN wget https://community-static.aldebaran.com/resources/2.5.10/Python%20SDK/pynaoqi-python2.7-2.5.7.1-linux64.tar.gz
+RUN wget http://community-static.aldebaran.com/resources/2.5.10/Python%20SDK/pynaoqi-python2.7-2.5.7.1-linux64.tar.gz
 RUN mkdir pynaoqi
 RUN tar -xvzf pynaoqi-python2.7-2.5.7.1-linux64.tar.gz
 

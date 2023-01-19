@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 class CameraResolution(enum.Enum):
     """
     Image height and width.
+
+    See also vision_definitions.kXXX constants in the Qi Framework.
     """
     NATIVE = -1, -1
     QQQQVGA = 30, 40
