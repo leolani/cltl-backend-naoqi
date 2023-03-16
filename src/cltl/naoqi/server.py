@@ -129,7 +129,7 @@ class BackendServer:
             if self._mic:
                 self._audio_source = self._mic.__enter__()
 
-            self.app.run(host=host, port=port)
+            self.app.run(host=host, port=port, threaded=True)
         finally:
             if self._audio_source:
                 self._audio_source.__exit__(None, None, None)
