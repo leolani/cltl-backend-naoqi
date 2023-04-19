@@ -36,9 +36,9 @@ class NAOqiTextToSpeech(TextOutput):
         language: str
         animation: str
         """
-        text = text.replace('...', r'\\pau=1000\\')
+        text = text.replace('...', r'\pau=1000\ ')
 
         if animation:
-            self._service.say(r"\\rspd={2}\\^startTag({1}){0}^stopTag({1})".format(text, animation, self._speed))
+            self._service.say(r"\rspd={2}\^startTag({1}){0}^stopTag({1})".format(text, animation, self._speed))
         else:
-            self._service.say(r"\\rspd={1}\\{0}".format(text, self._speed))
+            self._service.say(r"\rspd={1}\{0}".format(text, self._speed))
