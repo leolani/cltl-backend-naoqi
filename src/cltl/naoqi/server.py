@@ -10,6 +10,8 @@ from flask.json import JSONEncoder
 from cltl.naoqi.api.camera import Image, Bounds
 from cltl.naoqi.audio_source import NAOqiMicrophone
 from cltl.naoqi.image_source import NAOqiCamera
+from cltl.naoqi.behaviour import NAOqiBehaviourController
+from cltl.naoqi.spi.behaviour import Behaviour
 from cltl.naoqi.tts_output import NAOqiTextToSpeech
 
 logger = logging.getLogger(__name__)
@@ -34,10 +36,11 @@ class NumpyJSONEncoder(JSONEncoder):
 
 
 class BackendServer:
-    def __init__(self, mic, camera, tts):
+    def __init__(self, mic, camera, tts, behaviour):
         self._mic = mic
         self._camera = camera
         self._tts = tts
+        self._behaviour = behaviour
 
         self._app = None
         self._image_source = None
@@ -47,12 +50,13 @@ class BackendServer:
     def for_session(cls, naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer,
                  camera_resolution, camera_rate, tts_speed):
         mic = NAOqiMicrophone(naoqi_session, sampling_rate, channels, frame_size, audio_index, audio_buffer) \
-              if sampling_rate > 0 else None
+                 if sampling_rate > 0 else None
         camera = NAOqiCamera(naoqi_session, camera_resolution, camera_rate) \
                  if camera_rate > 0 else None
         tts = NAOqiTextToSpeech(naoqi_session, tts_speed)
+        behaviour = NAOqiBehaviourController(naoqi_session)
 
-        return cls(mic, camera, tts)
+        return cls(mic, camera, tts, behaviour)
 
     @property
     def app(self):
@@ -102,8 +106,18 @@ class BackendServer:
         # TODO support language and animations
         @self._app.route("/text", methods=['POST'])
         def tts():
-            text = request.data
+            text = request.data.decode('utf-8')
             self._tts.consume(text)
+
+            return Response(status=200)
+
+        @self._app.route("/behaviour/<behaviour_key>", methods=['PUT', 'DELETE'])
+        def behaviour(behaviour_key):
+            behaviour = Behaviour[behaviour_key.encode('ascii', 'ignore').strip().upper()]
+            if request.method == 'PUT':
+                self._behaviour.start(behaviour)
+            elif request.method == 'DELETE':
+                self._behaviour.stop(behaviour)
 
             return Response(status=200)
 
@@ -135,8 +149,8 @@ class BackendServer:
                 self._audio_source.__exit__(None, None, None)
                 self._audio_source = None
             if self._image_source:
-                self.self._image_source.__exit__(None, None, None)
-                self.self._image_source = None
+                self._image_source.__exit__(None, None, None)
+                self._image_source = None
 
     def _start_for_testing(self):
         """Method for testing only"""
