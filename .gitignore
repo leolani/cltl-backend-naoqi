@@ -133,3 +133,6 @@ dmypy.json
 
 makefile.d
 docker.lock
+
+
+**/.DS_Store
